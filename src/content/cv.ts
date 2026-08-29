@@ -9,7 +9,7 @@ export const profile = {
   location: "Holbrook, NY",
   phone: "+1 860 549 7679",
   email: "egiraldom@outlook.com",
-  linkedin: "https://linkedin.com/in/egiraldo",
+  linkedin: "https://linkedin.com/in/egiraldom",
 };
 
 type Dict = {
