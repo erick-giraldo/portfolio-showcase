@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/landing/theme-context";
 import { defaultSiteData, mergeSiteData, type SiteData } from "@/lib/site-content";
+import type { Json } from "@/integrations/supabase/types";
 import type { Lang } from "@/content/cv";
 
 const title = "Panel de administración — Erick Giraldo";
@@ -160,7 +161,7 @@ function AdminPage() {
     try {
       const { error } = await supabase
         .from("site_content")
-        .update({ data: current as unknown as Record<string, unknown>, updated_at: new Date().toISOString() })
+        .update({ data: current as unknown as Json, updated_at: new Date().toISOString() })
         .eq("id", "default");
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["site-content"] });
