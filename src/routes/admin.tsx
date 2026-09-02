@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Loader2, LogOut, Save, Upload } from "lucide-react";
+import { ArrowLeft, Loader2, LogOut, Plus, Save, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/landing/theme-context";
 import { defaultSiteData, mergeSiteData, type SiteData } from "@/lib/site-content";
-import type { Json } from "@/integrations/supabase/types";
 import type { Lang } from "@/content/cv";
 
 const title = "Panel de administración — Erick Giraldo";
@@ -28,11 +27,12 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type TabId = "perfil" | "textos" | "listas" | "archivos";
+type TabId = "perfil" | "textos" | "proyectos" | "listas" | "archivos";
 
 const tabs: { id: TabId; label: string }[] = [
   { id: "perfil", label: "Perfil y enlaces" },
   { id: "textos", label: "Textos" },
+  { id: "proyectos", label: "Proyectos" },
   { id: "listas", label: "Listas" },
   { id: "archivos", label: "Archivos" },
 ];
@@ -156,12 +156,28 @@ function AdminPage() {
   const setDict = (patch: Partial<SiteData["es"]>) =>
     setDraft({ ...current, [lang]: { ...dict, ...patch } });
 
+  type Project = SiteData["es"]["projects"][number];
+
+  const setProject = (index: number, patch: Partial<Project>) =>
+    setDict({ projects: dict.projects.map((p, i) => (i === index ? { ...p, ...patch } : p)) });
+
+  const addProject = () =>
+    setDict({
+      projects: [
+        ...dict.projects,
+        { name: "", year: String(new Date().getFullYear()), description: "", tags: [] },
+      ],
+    });
+
+  const removeProject = (index: number) =>
+    setDict({ projects: dict.projects.filter((_, i) => i !== index) });
+
   const save = async () => {
     setSaving(true);
     try {
       const { error } = await supabase
         .from("site_content")
-        .update({ data: current as unknown as Json, updated_at: new Date().toISOString() })
+        .update({ data: JSON.parse(JSON.stringify(current)), updated_at: new Date().toISOString() })
         .eq("id", "default");
       if (error) throw error;
       await queryClient.invalidateQueries({ queryKey: ["site-content"] });
@@ -351,6 +367,73 @@ function AdminPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            ) : null}
+
+            {tab === "proyectos" ? (
+              <div className="space-y-5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs text-muted-foreground">
+                    Edita tus proyectos destacados ({lang.toUpperCase()}). Añade el enlace al repositorio de GitHub de cada uno.
+                  </p>
+                  <button
+                    onClick={addProject}
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-border px-3.5 py-2 text-xs font-semibold text-foreground hover:border-primary"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Añadir proyecto
+                  </button>
+                </div>
+
+                {dict.projects.map((p, i) => (
+                  <div key={i} className="space-y-4 rounded-2xl border border-border/70 p-4">
+                    <div className="flex items-center justify-between">
+                      <p className="font-display text-xs uppercase tracking-[0.18em] text-aurora">
+                        Proyecto {String(i + 1).padStart(2, "0")}
+                      </p>
+                      <button
+                        onClick={() => removeProject(i)}
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive"
+                        aria-label="Eliminar proyecto"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Eliminar
+                      </button>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Field label="Título" value={p.name} onChange={(v) => setProject(i, { name: v })} />
+                      <Field label="Año" value={p.year} onChange={(v) => setProject(i, { year: v })} />
+                    </div>
+                    <Field
+                      label="Descripción"
+                      textarea
+                      rows={3}
+                      value={p.description}
+                      onChange={(v) => setProject(i, { description: v })}
+                    />
+                    <Field
+                      label="Tecnologías (separadas por comas)"
+                      value={p.tags.join(", ")}
+                      onChange={(v) => setProject(i, { tags: v.split(",").map((t) => t.trim()).filter(Boolean) })}
+                    />
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Field
+                        label="Enlace del proyecto (opcional)"
+                        value={p.href ?? ""}
+                        onChange={(v) => setProject(i, { href: v || undefined } as Partial<Project>)}
+                      />
+                      <Field
+                        label="Repositorio GitHub (opcional)"
+                        value={p.repo ?? ""}
+                        onChange={(v) => setProject(i, { repo: v || undefined } as Partial<Project>)}
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                {dict.projects.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Aún no hay proyectos. Pulsa «Añadir proyecto».</p>
+                ) : null}
               </div>
             ) : null}
 

@@ -115,16 +115,31 @@ export function ProjectsSection() {
                     </li>
                   ))}
                 </ul>
-                {p.href ? (
-                  <a
-                    href={p.href}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-aurora"
-                  >
-                    {t.cta.viewProject}
-                    <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </a>
+                {p.href || p.repo ? (
+                  <div className="mt-5 flex flex-wrap items-center gap-4">
+                    {p.href ? (
+                      <a
+                        href={p.href}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-aurora"
+                      >
+                        {t.cta.viewProject}
+                        <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      </a>
+                    ) : null}
+                    {p.repo ? (
+                      <a
+                        href={p.repo}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        <Github className="h-4 w-4" />
+                        {t.cta.viewRepo}
+                      </a>
+                    ) : null}
+                  </div>
                 ) : null}
               </article>
             </Tilt>

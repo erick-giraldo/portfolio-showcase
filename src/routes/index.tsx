@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LangProvider } from "@/components/landing/lang-context";
 import { ThemeProvider } from "@/components/landing/theme-context";
-import { CursorSpotlight, ScrollProgress } from "@/components/landing/effects";
+import { AuroraBackdrop, CursorSpotlight, ScrollProgress } from "@/components/landing/effects";
 import { Nav } from "@/components/landing/nav";
 import { Hero } from "@/components/landing/hero";
 
@@ -50,6 +50,7 @@ function Index() {
     <ThemeProvider>
       <LangProvider>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <AuroraBackdrop />
         <ScrollProgress />
         <CursorSpotlight />
         <Nav />

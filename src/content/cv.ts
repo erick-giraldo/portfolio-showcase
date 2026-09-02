@@ -14,7 +14,7 @@ export const profile = {
 
 type Dict = {
   nav: { about: string; stack: string; projects: string; repos: string; experience: string; contact: string };
-  cta: { downloadCv: string; contact: string; linkedin: string; viewProject: string };
+  cta: { downloadCv: string; contact: string; linkedin: string; viewProject: string; viewRepo: string };
   hero: {
     badge: string;
     role: string;
@@ -27,7 +27,7 @@ type Dict = {
     { eyebrow: string; title: string; subtitle: string }
   >;
   stack: { category: string; items: string[] }[];
-  projects: { name: string; year: string; description: string; tags: string[]; href?: string }[];
+  projects: { name: string; year: string; description: string; tags: string[]; href?: string; repo?: string }[];
   experience: { company: string; role: string; period: string; location: string; bullets: string[] }[];
   certifications: { name: string; issuer: string }[];
   education: { title: string; school: string; period: string }[];
@@ -51,6 +51,7 @@ export const content: Record<Lang, Dict> = {
       contact: "Contactar",
       linkedin: "LinkedIn",
       viewProject: "Ver proyecto",
+      viewRepo: "Repositorio",
     },
     hero: {
       badge: "Disponible para nuevas oportunidades",
@@ -225,6 +226,7 @@ export const content: Record<Lang, Dict> = {
       contact: "Get in touch",
       linkedin: "LinkedIn",
       viewProject: "View project",
+      viewRepo: "Repository",
     },
     hero: {
       badge: "Open to new opportunities",

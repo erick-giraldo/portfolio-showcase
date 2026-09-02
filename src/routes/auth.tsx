@@ -60,10 +60,10 @@ function AuthPage() {
     }
   };
 
-  const google = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
+  const oauth = async (provider: "google" | "apple") => {
+    const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin + "/auth" });
     if (result.error) {
-      toast.error("No se pudo iniciar sesión con Google");
+      toast.error(provider === "google" ? "No se pudo iniciar sesión con Google" : "No se pudo iniciar sesión con Apple");
       return;
     }
     if (result.redirected) return;
@@ -113,12 +113,20 @@ function AuthPage() {
             </button>
           </form>
 
-          <button
-            onClick={google}
-            className="mt-3 w-full rounded-xl border border-border py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary"
-          >
-            Continuar con Google
-          </button>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <button
+              onClick={() => oauth("google")}
+              className="rounded-xl border border-border py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary"
+            >
+              Google
+            </button>
+            <button
+              onClick={() => oauth("apple")}
+              className="rounded-xl border border-border py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary"
+            >
+               Apple
+            </button>
+          </div>
 
           <button
             onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
