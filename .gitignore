@@ -30,3 +30,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Local DB backups
+backups/
+
+# Next.js build output
+.next/
+*.tsbuildinfo

@@ -13,8 +13,21 @@ export const profile = {
 };
 
 type Dict = {
-  nav: { about: string; stack: string; projects: string; repos: string; experience: string; contact: string };
-  cta: { downloadCv: string; contact: string; linkedin: string; viewProject: string };
+  nav: {
+    about: string;
+    stack: string;
+    projects: string;
+    repos: string;
+    experience: string;
+    contact: string;
+  };
+  cta: {
+    downloadCv: string;
+    contact: string;
+    linkedin: string;
+    viewProject: string;
+    viewRepo: string;
+  };
   hero: {
     badge: string;
     role: string;
@@ -27,8 +40,21 @@ type Dict = {
     { eyebrow: string; title: string; subtitle: string }
   >;
   stack: { category: string; items: string[] }[];
-  projects: { name: string; year: string; description: string; tags: string[]; href?: string }[];
-  experience: { company: string; role: string; period: string; location: string; bullets: string[] }[];
+  projects: {
+    name: string;
+    year: string;
+    description: string;
+    tags: string[];
+    href?: string;
+    repo?: string;
+  }[];
+  experience: {
+    company: string;
+    role: string;
+    period: string;
+    location: string;
+    bullets: string[];
+  }[];
   certifications: { name: string; issuer: string }[];
   education: { title: string; school: string; period: string }[];
   languages: string;
@@ -51,6 +77,7 @@ export const content: Record<Lang, Dict> = {
       contact: "Contactar",
       linkedin: "LinkedIn",
       viewProject: "Ver proyecto",
+      viewRepo: "Repositorio",
     },
     hero: {
       badge: "Disponible para nuevas oportunidades",
@@ -100,7 +127,14 @@ export const content: Record<Lang, Dict> = {
     stack: [
       {
         category: "Frontend",
-        items: ["React.js", "Next.js", "TypeScript", "Tailwind CSS", "Custom Hooks", "memo / useMemo / useCallback"],
+        items: [
+          "React.js",
+          "Next.js",
+          "TypeScript",
+          "Tailwind CSS",
+          "Custom Hooks",
+          "memo / useMemo / useCallback",
+        ],
       },
       {
         category: "Arquitectura Next.js",
@@ -116,7 +150,14 @@ export const content: Record<Lang, Dict> = {
       },
       {
         category: "APIs y resiliencia",
-        items: ["REST", "OpenAPI", "Interceptors", "Retry logic", "Timeouts", "Fallback / degradación"],
+        items: [
+          "REST",
+          "OpenAPI",
+          "Interceptors",
+          "Retry logic",
+          "Timeouts",
+          "Fallback / degradación",
+        ],
       },
       {
         category: "Autenticación y seguridad",
@@ -200,7 +241,11 @@ export const content: Record<Lang, Dict> = {
       { name: "Claude 101", issuer: "Anthropic" },
     ],
     education: [
-      { title: "Full Stack Development", school: "Coderhouse — Buenos Aires, Argentina", period: "2022 – 2023" },
+      {
+        title: "Full Stack Development",
+        school: "Coderhouse — Buenos Aires, Argentina",
+        period: "2022 – 2023",
+      },
       {
         title: "Network & Communications Engineering",
         school: "ISIL Institute — Lima, Perú",
@@ -225,6 +270,7 @@ export const content: Record<Lang, Dict> = {
       contact: "Get in touch",
       linkedin: "LinkedIn",
       viewProject: "View project",
+      viewRepo: "Repository",
     },
     hero: {
       badge: "Open to new opportunities",
@@ -274,7 +320,14 @@ export const content: Record<Lang, Dict> = {
     stack: [
       {
         category: "Frontend",
-        items: ["React.js", "Next.js", "TypeScript", "Tailwind CSS", "Custom Hooks", "memo / useMemo / useCallback"],
+        items: [
+          "React.js",
+          "Next.js",
+          "TypeScript",
+          "Tailwind CSS",
+          "Custom Hooks",
+          "memo / useMemo / useCallback",
+        ],
       },
       {
         category: "Next.js architecture",
@@ -290,7 +343,14 @@ export const content: Record<Lang, Dict> = {
       },
       {
         category: "APIs & resilience",
-        items: ["REST", "OpenAPI", "Interceptors", "Retry logic", "Timeouts", "Fallback / degradation"],
+        items: [
+          "REST",
+          "OpenAPI",
+          "Interceptors",
+          "Retry logic",
+          "Timeouts",
+          "Fallback / degradation",
+        ],
       },
       {
         category: "Auth & security",
@@ -374,8 +434,16 @@ export const content: Record<Lang, Dict> = {
       { name: "Claude 101", issuer: "Anthropic" },
     ],
     education: [
-      { title: "Full Stack Development", school: "Coderhouse — Buenos Aires, Argentina", period: "2022 – 2023" },
-      { title: "Network & Communications Engineering", school: "ISIL Institute — Lima, Peru", period: "2016 – 2021" },
+      {
+        title: "Full Stack Development",
+        school: "Coderhouse — Buenos Aires, Argentina",
+        period: "2022 – 2023",
+      },
+      {
+        title: "Network & Communications Engineering",
+        school: "ISIL Institute — Lima, Peru",
+        period: "2016 – 2021",
+      },
     ],
     languages: "Spanish — Native · English — Basic",
     reposEmpty: "No public repositories to show yet.",

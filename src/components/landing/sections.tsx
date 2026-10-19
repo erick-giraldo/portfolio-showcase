@@ -1,40 +1,49 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { ArrowUpRight, Award, GitFork, GraduationCap, Mail, MapPin, Phone, Star } from "lucide-react";
-import { GITHUB_USERNAME, profile } from "@/content/cv";
-import { getGithubRepos } from "@/lib/github.functions";
+import { motion, useInView, useReducedMotion, useScroll, useSpring } from "motion/react";
+import { useRef, type ReactNode } from "react";
+import {
+  ArrowUpRight,
+  Award,
+  ChevronsRight,
+  Github,
+  GraduationCap,
+  Linkedin,
+  Mail,
+  MapPin,
+  Phone,
+  Star,
+} from "lucide-react";
+import type { Repo } from "@/lib/github";
+import { cn } from "@/lib/utils";
 import { useLang } from "./lang-context";
-import { Reveal, Section, SectionHeading } from "./primitives";
+import { Eyebrow, Magnetic, Reveal, ScrubText, Section, SectionHeading } from "./primitives";
 
 export function StackSection() {
   const { t } = useLang();
-  const marquee = t.stack.flatMap((g) => g.items).slice(0, 26);
 
   return (
     <Section id="stack">
       <SectionHeading {...t.sections.stack} />
 
-      <div className="relative mt-10 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
-        <div className="animate-marquee flex w-max gap-3">
-          {[...marquee, ...marquee].map((item, i) => (
-            <span
-              key={`${item}-${i}`}
-              className="whitespace-nowrap rounded-full border border-border bg-surface px-4 py-2 text-sm text-foreground/85"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {t.stack.map((group, i) => (
-          <Reveal key={group.category} delay={i * 0.05}>
-            <div className="glass-panel h-full rounded-xl p-5 transition-colors hover:border-primary/60">
-              <h3 className="font-display text-sm uppercase tracking-widest text-primary-glow">{group.category}</h3>
-              <ul className="mt-3 flex flex-wrap gap-2">
+          <Reveal key={group.category} delay={i * 0.06} className="h-full">
+            <div className="aller-card group flex h-full flex-col p-6">
+              <div className="flex items-center justify-between">
+                <span className="rounded-md bg-surface-2 px-2 py-1 text-xs font-medium text-foreground">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="h-1.5 w-1.5 rounded-full bg-border transition-colors duration-500 group-hover:bg-lime" />
+              </div>
+              <h3 className="mt-4 text-2xl leading-tight text-foreground">{group.category}</h3>
+              <ul className="mt-auto flex flex-wrap gap-1.5 pt-8">
                 {group.items.map((item) => (
-                  <li key={item} className="rounded-md bg-surface-2 px-2.5 py-1 text-xs text-muted-foreground">
+                  <li
+                    key={item}
+                    className="rounded-full border border-border/80 px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+                  >
                     {item}
                   </li>
                 ))}
@@ -54,31 +63,58 @@ export function ProjectsSection() {
     <Section id="projects">
       <SectionHeading {...t.sections.projects} />
 
-      <div className="mt-10 grid gap-5 lg:grid-cols-3">
+      <div className="mt-14 space-y-3">
         {t.projects.map((p, i) => (
-          <Reveal key={p.name} delay={i * 0.08} className="h-full">
-            <article className="group glass-panel flex h-full flex-col rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/70">
-              <span className="text-xs uppercase tracking-widest text-primary-glow">{p.year}</span>
-              <h3 className="mt-3 font-display text-xl font-semibold text-foreground">{p.name}</h3>
-              <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">{p.description}</p>
-              <ul className="mt-5 flex flex-wrap gap-1.5">
-                {p.tags.map((tag) => (
-                  <li key={tag} className="rounded-md border border-border px-2 py-0.5 text-[11px] text-muted-foreground">
-                    {tag}
-                  </li>
-                ))}
-              </ul>
-              {p.href ? (
-                <a
-                  href={p.href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-glow"
-                >
-                  {t.cta.viewProject}
-                  <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </a>
-              ) : null}
+          <Reveal key={p.name} delay={i * 0.06}>
+            <article className="aller-card group grid gap-6 p-6 sm:p-8 lg:grid-cols-[auto_1fr_1fr] lg:items-start lg:gap-10">
+              <span className="font-display text-5xl font-bold leading-none text-faint/60 transition-colors duration-500 group-hover:text-lime">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <span className="rounded-md bg-surface-2 px-2 py-1 text-xs font-medium text-foreground">
+                  {p.year}
+                </span>
+                <h3 className="mt-3 text-3xl leading-tight text-foreground">{p.name}</h3>
+                <ul className="mt-4 flex flex-wrap gap-1.5">
+                  {p.tags.map((tag) => (
+                    <li
+                      key={tag}
+                      className="rounded-full border border-border/80 px-2.5 py-0.5 text-[11px] text-muted-foreground"
+                    >
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="flex h-full flex-col">
+                <p className="text-sm leading-relaxed text-muted-foreground">{p.description}</p>
+                {p.href || p.repo ? (
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
+                    {p.href ? (
+                      <a
+                        href={p.href}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="ink-pill inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium"
+                      >
+                        {t.cta.viewProject}
+                        <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      </a>
+                    ) : null}
+                    {p.repo ? (
+                      <a
+                        href={p.repo}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-4 py-2 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+                      >
+                        <Github className="h-3.5 w-3.5" />
+                        {t.cta.viewRepo}
+                      </a>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
             </article>
           </Reveal>
         ))}
@@ -88,32 +124,36 @@ export function ProjectsSection() {
 }
 
 export function ReposSection() {
-  const { t } = useLang();
-  const fetchRepos = useServerFn(getGithubRepos);
+  const { t, profile } = useLang();
+  const username = profile.githubUser;
+
   const { data } = useQuery({
-    queryKey: ["github-repos", GITHUB_USERNAME],
-    queryFn: () => fetchRepos({ data: { username: GITHUB_USERNAME } }),
-    enabled: GITHUB_USERNAME.length > 0,
+    queryKey: ["github-repos", username],
+    queryFn: async (): Promise<Repo[]> => {
+      const res = await fetch(`/api/github-repos?username=${encodeURIComponent(username)}`);
+      return res.ok ? res.json() : [];
+    },
+    enabled: username.length > 0,
     staleTime: 60 * 60 * 1000,
   });
 
-  if (!GITHUB_USERNAME) return null;
+  if (!username) return null;
 
   return (
     <Section id="repos">
       <SectionHeading {...t.sections.repos} />
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {(data ?? []).map((repo, i) => (
           <Reveal key={repo.id} delay={i * 0.05} className="h-full">
             <a
               href={repo.url}
               target="_blank"
               rel="noreferrer noopener"
-              className="glass-panel flex h-full flex-col rounded-xl p-5 transition-all hover:-translate-y-1 hover:border-primary/70"
+              className="aller-card flex h-full flex-col p-6"
             >
               <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-2 font-display text-sm font-semibold text-foreground">
-                  <GitFork className="h-4 w-4 text-primary-glow" />
+                <span className="inline-flex items-center gap-2 font-display text-lg font-semibold text-foreground">
+                  <Github className="h-4 w-4" />
                   {repo.name}
                 </span>
                 <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
@@ -122,47 +162,85 @@ export function ReposSection() {
                 </span>
               </div>
               <p className="mt-3 flex-1 text-sm text-muted-foreground">{repo.description ?? "—"}</p>
-              {repo.language ? <span className="mt-4 text-xs text-primary-glow">{repo.language}</span> : null}
+              {repo.language ? (
+                <span className="mt-4 inline-flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="h-1.5 w-1.5 rounded-full bg-lime" />
+                  {repo.language}
+                </span>
+              ) : null}
             </a>
           </Reveal>
         ))}
-        {data && data.length === 0 ? <p className="text-sm text-muted-foreground">{t.reposEmpty}</p> : null}
+        {data && data.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t.reposEmpty}</p>
+        ) : null}
       </div>
     </Section>
   );
 }
 
+function TimelineNode({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reached = useInView(ref, { margin: "0px 0px -50% 0px" });
+
+  return (
+    <div ref={ref} className="relative pb-6 last:pb-0">
+      <span
+        className={cn(
+          "absolute -left-[37px] top-8 h-3 w-3 rounded-full border-2 transition-colors duration-500 sm:-left-[53px]",
+          reached ? "border-foreground bg-lime" : "border-border bg-background",
+        )}
+      />
+      {children}
+    </div>
+  );
+}
+
 export function ExperienceSection() {
   const { t } = useLang();
+  const reduced = useReducedMotion();
+  const listRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: listRef, offset: ["start 0.6", "end 0.6"] });
+  const scaleY = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
 
   return (
     <Section id="experience">
       <SectionHeading {...t.sections.experience} />
 
-      <div className="mt-10 border-l border-border pl-6 sm:pl-10">
+      <div ref={listRef} className="relative mt-14 pl-8 sm:pl-12">
+        <span aria-hidden className="absolute left-[5px] top-0 h-full w-px bg-border" />
+        <motion.span
+          aria-hidden
+          className="absolute left-[5px] top-0 h-full w-px origin-top bg-foreground"
+          style={reduced ? {} : { scaleY }}
+        />
         {t.experience.map((job, i) => (
-          <Reveal key={job.company} delay={i * 0.08}>
-            <div className="relative pb-12 last:pb-0">
-              <span className="absolute -left-[31px] top-1.5 grid h-3 w-3 place-items-center rounded-full bg-primary sm:-left-[47px]">
-                <span className="h-3 w-3 animate-ping rounded-full bg-primary/60" />
-              </span>
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 className="font-display text-xl font-semibold text-foreground">{job.role}</h3>
-                <span className="text-xs uppercase tracking-widest text-primary-glow">{job.period}</span>
+          <TimelineNode key={job.company}>
+            <Reveal delay={i * 0.04}>
+              <div className="aller-card p-6 sm:p-8">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h3 className="text-2xl text-foreground">{job.role}</h3>
+                  <span className="rounded-md bg-surface-2 px-2 py-1 text-xs font-medium text-foreground">
+                    {job.period}
+                  </span>
+                </div>
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  {job.company} · {job.location}
+                </p>
+                <ul className="mt-5 space-y-2.5">
+                  {job.bullets.map((b) => (
+                    <li
+                      key={b}
+                      className="flex gap-3 text-sm leading-relaxed text-muted-foreground"
+                    >
+                      <span className="mt-2 h-1 w-3 shrink-0 rounded-full bg-lime" />
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {job.company} · {job.location}
-              </p>
-              <ul className="mt-4 space-y-2.5">
-                {job.bullets.map((b) => (
-                  <li key={b} className="flex gap-3 text-sm leading-relaxed text-muted-foreground">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-primary-glow" />
-                    {b}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
+            </Reveal>
+          </TimelineNode>
         ))}
       </div>
     </Section>
@@ -176,26 +254,32 @@ export function CredentialsSection() {
     <Section id="credentials">
       <SectionHeading {...t.sections.credentials} />
 
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {t.certifications.map((c, i) => (
           <Reveal key={c.name} delay={i * 0.05} className="h-full">
-            <div className="glass-panel h-full rounded-xl p-5 transition-colors hover:border-primary/60">
-              <Award className="h-5 w-5 text-primary-glow" />
-              <h3 className="mt-3 font-display text-sm font-semibold text-foreground">{c.name}</h3>
+            <div className="aller-card group h-full p-6">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-foreground transition-colors duration-500 group-hover:bg-lime group-hover:text-[#121212]">
+                <Award className="h-5 w-5" />
+              </span>
+              <h3 className="mt-5 text-lg leading-snug text-foreground">{c.name}</h3>
               <p className="mt-1 text-xs text-muted-foreground">{c.issuer}</p>
             </div>
           </Reveal>
         ))}
       </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
         {t.education.map((e, i) => (
           <Reveal key={e.title} delay={i * 0.05}>
-            <div className="glass-panel rounded-xl p-5">
-              <GraduationCap className="h-5 w-5 text-primary-glow" />
-              <h3 className="mt-3 font-display text-base font-semibold text-foreground">{e.title}</h3>
+            <div className="aller-card group p-6">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-foreground transition-colors duration-500 group-hover:bg-lime group-hover:text-[#121212]">
+                <GraduationCap className="h-5 w-5" />
+              </span>
+              <h3 className="mt-5 text-xl text-foreground">{e.title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{e.school}</p>
-              <p className="mt-1 text-xs uppercase tracking-widest text-primary-glow">{e.period}</p>
+              <p className="mt-3 inline-block rounded-md bg-surface-2 px-2 py-1 text-xs font-medium text-foreground">
+                {e.period}
+              </p>
             </div>
           </Reveal>
         ))}
@@ -205,46 +289,76 @@ export function CredentialsSection() {
 }
 
 export function ContactSection() {
-  const { t } = useLang();
+  const { t, profile } = useLang();
+
+  const secondary =
+    "inline-flex items-center gap-2 rounded-full bg-white/8 px-5 py-3 text-sm font-medium text-white ring-1 ring-white/10 transition-colors hover:bg-white/15";
 
   return (
-    <Section id="contact">
+    <Section id="contact" className="pb-28">
       <Reveal>
-        <div className="glow-ring relative overflow-hidden rounded-3xl border border-border bg-surface p-8 sm:p-14">
-          <div className="animate-aurora pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/25 blur-[110px]" />
+        <div className="relative overflow-hidden rounded-[2rem] bg-ink p-8 text-ink-foreground sm:p-14 dark:ring-1 dark:ring-white/10">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgb(255_255_255/0.08)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_at_80%_20%,black,transparent_70%)]" />
+          <div className="float-soft pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-lime/25 blur-[90px]" />
           <div className="relative">
-            <span className="text-xs uppercase tracking-[0.24em] text-primary-glow">{t.sections.contact.eyebrow}</span>
-            <h2 className="mt-4 text-3xl font-semibold text-foreground sm:text-4xl">{t.sections.contact.title}</h2>
-            <p className="mt-3 max-w-xl text-muted-foreground">{t.sections.contact.subtitle}</p>
+            <Eyebrow className="text-white">{t.sections.contact.eyebrow}</Eyebrow>
+            <h2 className="mt-5 max-w-3xl text-4xl leading-[1.05] sm:text-6xl">
+              <ScrubText text={t.sections.contact.title} />
+            </h2>
+            <p className="mt-4 max-w-xl text-white/60">{t.sections.contact.subtitle}</p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href={`mailto:${profile.email}`}
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.03]"
-              >
-                <Mail className="h-4 w-4" />
-                {profile.email}
-              </a>
-              <a
-                href={`tel:${profile.phone.replace(/\s/g, "")}`}
-                className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary"
-              >
+            <div className="mt-10 flex flex-wrap gap-3">
+              <Magnetic>
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="lime-cta inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold"
+                >
+                  <Mail className="h-4 w-4" />
+                  {profile.email}
+                  <ChevronsRight className="h-4 w-4" />
+                </a>
+              </Magnetic>
+              <a href={`tel:${profile.phone.replace(/\s/g, "")}`} className={secondary}>
                 <Phone className="h-4 w-4" />
                 {profile.phone}
               </a>
-              <span className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-3 text-sm text-muted-foreground">
+              <a
+                href={profile.linkedin}
+                target="_blank"
+                rel="noreferrer noopener"
+                className={secondary}
+              >
+                <Linkedin className="h-4 w-4" />
+                LinkedIn
+              </a>
+              {profile.github ? (
+                <a
+                  href={profile.github}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className={secondary}
+                >
+                  <Github className="h-4 w-4" />
+                  GitHub
+                </a>
+              ) : null}
+            </div>
+
+            <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-2 border-t border-white/10 pt-6 text-sm text-white/55">
+              <span className="inline-flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
                 {profile.location}
               </span>
+              <span>{t.languages}</span>
             </div>
-
-            <p className="mt-6 text-sm text-muted-foreground">{t.languages}</p>
           </div>
         </div>
       </Reveal>
 
-      <footer className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground">
-        <span>© {new Date().getFullYear()} {profile.name}</span>
+      <footer className="mt-10 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+        <span>
+          © {new Date().getFullYear()} {profile.name}
+        </span>
         <span>{t.footerNote}</span>
       </footer>
     </Section>

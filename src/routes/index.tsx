@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LangProvider } from "@/components/landing/lang-context";
 import { ThemeProvider } from "@/components/landing/theme-context";
-import { CursorSpotlight, ScrollProgress } from "@/components/landing/effects";
-import { Nav } from "@/components/landing/nav";
+import { FrameRails, IntroLoader } from "@/components/landing/effects";
+import { Dock, Nav } from "@/components/landing/nav";
+import { CursorField } from "@/components/landing/cursor-field";
+import { SoundEffects, SoundWidget } from "@/components/landing/sound";
 import { Hero } from "@/components/landing/hero";
 
 import {
@@ -40,19 +42,40 @@ const jsonLd = {
   jobTitle: "Full Stack Developer & IT Infrastructure Manager",
   email: `mailto:${profile.email}`,
   telephone: profile.phone,
-  address: { "@type": "PostalAddress", addressLocality: "Holbrook", addressRegion: "NY", addressCountry: "US" },
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Holbrook",
+    addressRegion: "NY",
+    addressCountry: "US",
+  },
   sameAs: [profile.linkedin],
-  knowsAbout: ["React", "Next.js", "TypeScript", "NestJS", "Google Cloud Platform", "Docker", "OAuth2", "FinTech"],
+  knowsAbout: [
+    "React",
+    "Next.js",
+    "TypeScript",
+    "NestJS",
+    "Google Cloud Platform",
+    "Docker",
+    "OAuth2",
+    "FinTech",
+  ],
 };
 
 function Index() {
   return (
     <ThemeProvider>
       <LangProvider>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        <ScrollProgress />
-        <CursorSpotlight />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <IntroLoader />
+        <FrameRails />
+        <CursorField />
+        <SoundEffects />
         <Nav />
+        <Dock />
+        <SoundWidget />
         <main className="relative z-10">
           <Hero />
           <StackSection />

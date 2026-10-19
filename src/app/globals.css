@@ -1,0 +1,800 @@
+@import "tailwindcss" source(none);
+@source "..";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system — "Obsidian & Aurora"
+ * Obsidian black glass, violet + cyan aurora accents. All colors in oklch.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow: var(--primary-glow);
+  --color-aurora: var(--aurora);
+  --color-lime: var(--lime);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-faint: var(--faint);
+  --color-frame: var(--frame);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-display: var(--font-rajdhani), "Rajdhani", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/*
+ * Light — "Aller Porcelain": paper greys, ink black, electric lime accent.
+ * Dark — "Aller Graphite": the same system inverted on #121212.
+ */
+:root {
+  --radius: 1rem;
+  --background: #f9fafb;
+  --foreground: #191c20;
+  --card: #ffffff;
+  --card-foreground: #191c20;
+  --popover: #ffffff;
+  --popover-foreground: #191c20;
+  --primary: #121212;
+  --primary-foreground: #ffffff;
+  --primary-glow: #383838;
+  --aurora: #5f7400;
+  --lime: #d5fe00;
+  --ink: #121212;
+  --ink-foreground: #ffffff;
+  --secondary: #f2f4f5;
+  --secondary-foreground: #191c20;
+  --muted: #f2f4f5;
+  --muted-foreground: #4e5964;
+  --faint: #949494;
+  --accent: #eef1f3;
+  --accent-foreground: #191c20;
+  --destructive: #e5484d;
+  --destructive-foreground: #ffffff;
+  --border: #dadee2;
+  --input: #dadee2;
+  --ring: #121212;
+  --surface: #ffffff;
+  --surface-2: #f2f4f5;
+  --frame: #e6e9ec;
+  --chart-1: #121212;
+  --chart-2: #d5fe00;
+  --chart-3: #646aed;
+  --chart-4: #fc4b08;
+  --chart-5: #949494;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #191c20;
+  --sidebar-primary: #121212;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f2f4f5;
+  --sidebar-accent-foreground: #191c20;
+  --sidebar-border: #dadee2;
+  --sidebar-ring: #121212;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-reveal: cubic-bezier(0.44, 0, 0.34, 0.98);
+  --ease-spring-soft: linear(
+    0,
+    0.0363,
+    0.1167,
+    0.2147,
+    0.3156,
+    0.4115,
+    0.4986,
+    0.5757,
+    0.6426,
+    0.7001,
+    0.7489,
+    0.7902,
+    0.8249,
+    0.854,
+    0.8784,
+    0.8988,
+    0.9158,
+    0.9299,
+    0.9417,
+    0.9516,
+    0.9597,
+    0.9665,
+    0.9722,
+    0.9769,
+    0.9808,
+    0.984,
+    0.9867,
+    0.989,
+    0.9908,
+    0.9924,
+    0.9937,
+    0.9947,
+    0.9956,
+    0.9964,
+    0.997,
+    0.9975,
+    0.9979,
+    0.9983,
+    0.9986,
+    0.9988,
+    1
+  );
+  --ease-spring-heavy: linear(
+    0,
+    0.0567,
+    0.1625,
+    0.2811,
+    0.3885,
+    0.4835,
+    0.568,
+    0.6372,
+    0.6956,
+    0.7463,
+    0.7874,
+    0.8218,
+    0.8516,
+    0.8756,
+    0.8958,
+    0.9132,
+    0.9273,
+    0.939,
+    0.9492,
+    0.9575,
+    0.9644,
+    0.9703,
+    0.9751,
+    0.9793,
+    0.9826,
+    0.9855,
+    0.9879,
+    0.9898,
+    0.9915,
+    0.9929,
+    0.9941,
+    0.995,
+    0.9959,
+    0.9965,
+    0.9971,
+    0.9976,
+    0.998,
+    0.9983,
+    0.9986,
+    0.9988,
+    1
+  );
+}
+
+.dark {
+  --background: #121212;
+  --foreground: #f2f4f5;
+  --card: #1e1e1e;
+  --card-foreground: #f2f4f5;
+  --popover: #1e1e1e;
+  --popover-foreground: #f2f4f5;
+  --primary: #f2f4f5;
+  --primary-foreground: #121212;
+  --primary-glow: #d6d6d6;
+  --aurora: #d5fe00;
+  --ink: #000000;
+  --ink-foreground: #ffffff;
+  --secondary: #242424;
+  --secondary-foreground: #f2f4f5;
+  --muted: #1e1e1e;
+  --muted-foreground: #a3abb3;
+  --faint: #6b6b6b;
+  --accent: #242424;
+  --accent-foreground: #f2f4f5;
+  --destructive: #ff6369;
+  --destructive-foreground: #121212;
+  --border: #2e2e2e;
+  --input: #2e2e2e;
+  --ring: #d5fe00;
+  --surface: #1a1a1a;
+  --surface-2: #242424;
+  --frame: #232323;
+  --sidebar: #1a1a1a;
+  --sidebar-foreground: #f2f4f5;
+  --sidebar-primary: #f2f4f5;
+  --sidebar-primary-foreground: #121212;
+  --sidebar-accent: #242424;
+  --sidebar-accent-foreground: #f2f4f5;
+  --sidebar-border: #2e2e2e;
+  --sidebar-ring: #d5fe00;
+}
+
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition:
+    background-color 380ms ease,
+    border-color 380ms ease,
+    color 380ms ease,
+    fill 380ms ease,
+    stroke 380ms ease,
+    box-shadow 380ms ease !important;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: var(--lime);
+    color: #121212;
+  }
+}
+
+@utility glass-panel {
+  background: color-mix(in oklab, var(--surface) 72%, transparent);
+  border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+}
+
+/* Frosted card with an inner top highlight — the signature surface. */
+@utility glass-card {
+  position: relative;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--foreground) 5%, transparent) 0%,
+      transparent 45%
+    ),
+    color-mix(in oklab, var(--surface) 80%, transparent);
+  border: 1px solid color-mix(in oklab, var(--border) 90%, transparent);
+  backdrop-filter: blur(18px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in oklab, var(--foreground) 8%, transparent),
+    0 24px 60px -40px color-mix(in oklab, var(--primary) 70%, transparent);
+  transition:
+    transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 400ms ease,
+    box-shadow 500ms ease;
+
+  &:hover {
+    border-color: color-mix(in oklab, var(--primary) 55%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 color-mix(in oklab, var(--foreground) 12%, transparent),
+      0 34px 80px -40px color-mix(in oklab, var(--primary) 85%, transparent);
+  }
+}
+
+@utility text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--foreground) 0%,
+    var(--primary-glow) 45%,
+    var(--aurora) 78%,
+    var(--foreground) 100%
+  );
+  background-size: 220% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-pan 9s ease-in-out infinite;
+}
+
+@keyframes gradient-pan {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@utility grid-backdrop {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--border) 60%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--border) 60%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 72px 72px;
+}
+
+@utility glow-ring {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--primary) 38%, transparent),
+    0 24px 70px -30px color-mix(in oklab, var(--primary) 75%, transparent);
+}
+
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee-x 46s linear infinite;
+}
+
+@utility animate-marquee-reverse {
+  animation: marquee-x 52s linear infinite reverse;
+}
+
+@keyframes aurora-drift {
+  0%,
+  100% {
+    transform: translate3d(-7%, -5%, 0) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate3d(7%, 4%, 0) scale(1.18) rotate(8deg);
+  }
+  66% {
+    transform: translate3d(-3%, 8%, 0) scale(1.05) rotate(-6deg);
+  }
+}
+
+@utility animate-aurora {
+  animation: aurora-drift 22s ease-in-out infinite;
+}
+
+@utility animate-aurora-slow {
+  animation: aurora-drift 34s ease-in-out infinite reverse;
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@utility animate-float {
+  animation: float-y 7s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@utility animate-spin-slow {
+  animation: spin-slow 16s linear infinite;
+}
+
+@keyframes shine-x {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(320%) skewX(-18deg);
+  }
+}
+
+/* Sheen sweep on hover */
+@utility shine {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 45%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, white 45%, transparent),
+      transparent
+    );
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &:hover::after {
+    opacity: 1;
+    animation: shine-x 900ms ease;
+  }
+}
+
+/* Animated conic gradient border */
+@utility conic-ring {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -1.5px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      color-mix(in oklab, var(--primary) 95%, transparent) 80deg,
+      color-mix(in oklab, var(--aurora) 95%, transparent) 170deg,
+      transparent 280deg
+    );
+    animation: spin-slow 9s linear infinite;
+    z-index: -1;
+  }
+}
+
+@utility card-3d {
+  transform-style: preserve-3d;
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 420ms ease;
+
+  &:hover {
+    transform: translateY(-6px) rotateX(4deg) rotateY(-4deg);
+    box-shadow: 0 30px 60px -32px color-mix(in oklab, var(--primary) 75%, transparent);
+  }
+}
+
+@utility noise-overlay {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--foreground) 9%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 3px 3px;
+}
+
+/* Aurora ribbon band used behind hero + CTA blocks */
+@utility aurora-mesh {
+  background-image:
+    radial-gradient(
+      60% 50% at 15% 20%,
+      color-mix(in oklab, var(--primary) 45%, transparent) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      55% 45% at 85% 15%,
+      color-mix(in oklab, var(--aurora) 38%, transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      50% 60% at 60% 90%,
+      color-mix(in oklab, var(--primary-glow) 35%, transparent) 0%,
+      transparent 65%
+    );
+  filter: blur(40px);
+}
+
+@keyframes beam-fall {
+  0% {
+    transform: translateY(-120%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(420%);
+    opacity: 0;
+  }
+}
+
+@utility animate-beam {
+  animation: beam-fall 7s linear infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+@utility animate-pulse-ring {
+  animation: pulse-ring 2.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+/* ── Aller motion system ───────────────────────────────────────── */
+
+/* Header drops in from above on a heavy spring once the intro clears. */
+@keyframes header-in {
+  0% {
+    transform: translateY(-140px);
+  }
+}
+
+@utility header-in {
+  animation: header-in 1.2s var(--ease-spring-heavy) both;
+}
+
+.is-loading .header-in,
+.is-loading .dock-in {
+  animation-play-state: paused;
+}
+
+@keyframes dock-in {
+  0% {
+    transform: translateY(140px);
+    opacity: 0;
+  }
+}
+
+@utility dock-in {
+  animation: dock-in 1s var(--ease-spring-heavy) 0.35s both;
+}
+
+/* Slow drifting float for hero objects. */
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translate(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-12px) rotate(0.8deg);
+  }
+}
+
+@utility float-soft {
+  animation: float-soft var(--float-time, 6s) ease-in-out var(--float-delay, 0s) infinite;
+  will-change: transform;
+}
+
+/* Expanding halo behind live-status dots. */
+@keyframes status-pulse {
+  0% {
+    opacity: 0.64;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(2.75);
+  }
+}
+
+@utility status-pulse {
+  animation: status-pulse 1.8s var(--ease-out-expo) infinite;
+}
+
+/* Lime pill with a dark blob drifting through it — the signature CTA. */
+@keyframes lime-drift {
+  0%,
+  100% {
+    background-position:
+      0% 50%,
+      0 0;
+  }
+  50% {
+    background-position:
+      100% 50%,
+      0 0;
+  }
+}
+
+@utility lime-cta {
+  background-image:
+    radial-gradient(38% 120% at var(--blob-x, 50%) 50%, rgb(18 18 18 / 0.55), transparent 70%),
+    linear-gradient(100deg, #b9e000, #d5fe00 45%, #e6ff5c);
+  background-size:
+    260% 100%,
+    100% 100%;
+  color: #121212;
+  animation: lime-drift 5s ease-in-out infinite;
+  transition:
+    transform 500ms var(--ease-out-expo),
+    box-shadow 500ms ease;
+
+  &:hover {
+    box-shadow: 0 10px 30px -10px rgb(213 254 0 / 0.75);
+  }
+}
+
+/* Black pill buttons used across the page. */
+@utility ink-pill {
+  background: var(--ink);
+  color: var(--ink-foreground);
+  transition:
+    transform 500ms var(--ease-out-expo),
+    background-color 300ms ease;
+
+  &:hover {
+    background: #2a2a2a;
+  }
+}
+
+/* Plain white card with hairline border, as on allerstudio.com */
+@utility aller-card {
+  background: var(--card);
+  border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  border-radius: 1rem;
+  transition:
+    transform 700ms var(--ease-out-expo),
+    border-color 300ms ease,
+    box-shadow 700ms var(--ease-out-expo);
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: var(--border);
+    box-shadow: 0 30px 60px -40px rgb(18 18 18 / 0.35);
+  }
+}
+
+/* Crosshair registration mark drawn at frame intersections. */
+@utility cross-mark {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    background: var(--faint);
+    opacity: 0.55;
+  }
+
+  &::before {
+    left: 7px;
+    top: 0;
+    width: 1px;
+    height: 15px;
+  }
+
+  &::after {
+    top: 7px;
+    left: 0;
+    width: 15px;
+    height: 1px;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@utility animate-logo-marquee {
+  animation: marquee 38s linear infinite;
+}
+
+@keyframes sound-bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@utility sound-bar {
+  transform-origin: bottom;
+  animation: sound-bar 0.9s ease-in-out infinite;
+}
+
+/* Long track titles scroll inside the player. */
+@keyframes player-marquee {
+  0%,
+  15% {
+    transform: translateX(0);
+  }
+  85%,
+  100% {
+    transform: translateX(calc(-100% + 16rem));
+  }
+}
+
+@utility player-marquee {
+  animation: player-marquee 9s ease-in-out infinite alternate;
+}
+
+/* Slim lime volume slider. */
+@utility player-range {
+  appearance: none;
+  height: 3px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    #d5fe00 var(--fill, 50%),
+    rgb(255 255 255 / 0.15) var(--fill, 50%)
+  );
+  cursor: pointer;
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 9999px;
+    background: #fff;
+  }
+
+  &::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border: 0;
+    border-radius: 9999px;
+    background: #fff;
+  }
+}
+
+/* Intro loader: hidden immediately for repeat visits in this session. */
+.intro-seen #intro-loader {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

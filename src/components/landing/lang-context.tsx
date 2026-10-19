@@ -1,9 +1,23 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { content, type Lang } from "@/content/cv";
+"use client";
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import { useQuery } from "@tanstack/react-query";
+import type { Lang } from "@/content/cv";
+import { supabase } from "@/integrations/supabase/client";
+import { defaultSiteData, mergeSiteData, type Dict, type SiteProfile } from "@/lib/site-content";
 
 type LangContextValue = {
   lang: Lang;
-  t: (typeof content)["es"];
+  t: Dict;
+  profile: SiteProfile;
   toggle: () => void;
 };
 
@@ -11,8 +25,26 @@ const LangContext = createContext<LangContextValue | null>(null);
 
 const STORAGE_KEY = "cv-lang";
 
+export function useSiteData() {
+  const { data } = useQuery({
+    queryKey: ["site-content"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_content")
+        .select("data")
+        .eq("id", "default")
+        .maybeSingle();
+      if (error) throw error;
+      return mergeSiteData(data?.data ?? {});
+    },
+    staleTime: 60_000,
+  });
+  return data ?? defaultSiteData;
+}
+
 export function LangProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>("es");
+  const site = useSiteData();
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -31,7 +63,10 @@ export function LangProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const value = useMemo(() => ({ lang, t: content[lang], toggle }), [lang, toggle]);
+  const value = useMemo(
+    () => ({ lang, t: site[lang], profile: site.profile, toggle }),
+    [lang, site, toggle],
+  );
 
   return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
 }
