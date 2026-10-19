@@ -53,6 +53,10 @@
     "src/routeTree.gen.ts",
     "src/router.tsx",
     "src/start.ts",
-    "src/server.ts"
+    "src/server.ts",
+    "src/integrations/lovable",
+    "src/integrations/supabase/auth-attacher.ts",
+    "src/integrations/supabase/auth-middleware.ts",
+    "src/lib/github.functions.ts"
   ]
 }
