@@ -1,3 +1,5 @@
+"use client";
+
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { ChevronsRight, MapPin } from "lucide-react";

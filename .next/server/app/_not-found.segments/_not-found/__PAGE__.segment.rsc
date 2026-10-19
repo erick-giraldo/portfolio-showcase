@@ -1,0 +1,31 @@
+1:"$Sreact.fragment"
+2:"/_next/static/chunks/063wh5z2yncv1.js"
+3:"/_next/static/chunks/3vfryjkqx3ukp.js"
+4:I[44636,["$2","$3"],"Providers"]
+5:I[39756,["$2","$3"],"default"]
+6:I[37457,["$2","$3"],"default"]
+7:"/_next/static/chunks/2n5qeheznvl4u.js"
+8:I[22016,["$2","$3","$7"],""]
+f:I[97367,["$2","$3"],"OutletBoundary"]
+10:"$Sreact.suspense"
+13:"ViewportBoundary"
+14:I[97367,["$2","$3"],"$13"]
+15:"MetadataBoundary"
+16:I[97367,["$2","$3"],"$15"]
+17:I[27201,["$2","$3"],"IconMark"]
+:HL["/_next/static/chunks/2gtql7nw3xgj-.css","style"]
+a:X
+d:X
+d:C
+e:[["children",{"s":"__PAGE__","h":160,"d":{"r":["$","$1","c",{"children":[["$","div",null,{"className":"flex min-h-screen items-center justify-center bg-background px-4","children":["$","div",null,{"className":"max-w-md text-center","children":[["$","h1",null,{"className":"font-display text-7xl font-bold text-foreground","children":"404"}],["$","h2",null,{"className":"mt-4 text-xl font-semibold text-foreground","children":"Página no encontrada"}],["$","p",null,{"className":"mt-2 text-sm text-muted-foreground","children":"La página que buscas no existe o fue movida."}],["$","div",null,{"className":"mt-6","children":["$","$L8",null,{"href":"/","className":"ink-pill inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium","children":"Volver al inicio"}]}]]}]}],[["$","script","script-0",{"src":"/_next/static/chunks/2n5qeheznvl4u.js","async":true}]],["$","$Lf",null,{"children":["$","$10",null,{"name":"Next.MetadataOutlet","children":"$@11"}]}]]}],"p":"$@12","v":null,"s":"$a"}}]]
+b:[["children",{"s":"/_not-found","h":96,"d":{"r":["$","$1","c",{"children":[null,["$","$L5",null,{"parallelRouterKey":"children","template":["$","$L6",null,{}]}]]}],"p":"$@c","v":"$d","s":"$a"},"c":"$Qe"}]]
+0:{"t":{"t":{"s":"","h":80,"d":{"r":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/2gtql7nw3xgj-.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/063wh5z2yncv1.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/3vfryjkqx3ukp.js","async":true}]],["$","html",null,{"lang":"es","suppressHydrationWarning":true,"className":"ufb0Uq_variable ig9XPW_variable aCpfjq_variable","children":[["$","head",null,{"children":[["$","script",null,{"dangerouslySetInnerHTML":{"__html":"(function(){try{var s=localStorage.getItem('cv-theme');var d=s==='dark';document.documentElement.classList.toggle('dark',d);}catch(e){}})();"}}],["$","script",null,{"dangerouslySetInnerHTML":{"__html":"(function(){var d=document.documentElement;try{if(sessionStorage.getItem('intro-seen')||matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('intro-seen');}else{d.classList.add('is-loading');}}catch(e){d.classList.add('intro-seen');}})();"}}]]}],["$","body",null,{"children":["$","$L4",null,{"children":["$","$L5",null,{"parallelRouterKey":"children","template":["$","$L6",null,{}],"notFound":[["$","div",null,{"className":"flex min-h-screen items-center justify-center bg-background px-4","children":["$","div",null,{"className":"max-w-md text-center","children":[["$","h1",null,{"className":"font-display text-7xl font-bold text-foreground","children":"404"}],["$","h2",null,{"className":"mt-4 text-xl font-semibold text-foreground","children":"Página no encontrada"}],["$","p",null,{"className":"mt-2 text-sm text-muted-foreground","children":"La página que buscas no existe o fue movida."}],["$","div",null,{"className":"mt-6","children":["$","$L8",null,{"href":"/","className":"ink-pill inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium","children":"Volver al inicio"}]}]]}]}],[]]}]}]}]]}]]}],"p":"$@9","v":null,"s":"$a"},"c":"$Qb"},"h":{"r":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L14",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","$L16",null,{"children":[["$","div",null,{"hidden":true,"children":["$","$10",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Erick Giraldo Muñoz"}],["$","meta","1",{"name":"description","content":"Portafolio de Erick Giraldo Muñoz."}],["$","link","2",{"rel":"icon","href":"/favicon.ico"}],["$","$L17","3",{}]]}]}],null]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"p":"$@18","v":null,"s":"$a"}},"a":"$@19","u":"$@1a","b":"HsTw2ajY7R2spLKgebT9V"}
+11:null
+a:300
+1a:true
+a:C
+19:0
+c:"$undefined"
+9:"$undefined"
+18:"$undefined"
+12:"$undefined"

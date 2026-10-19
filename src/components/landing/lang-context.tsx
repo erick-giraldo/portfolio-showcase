@@ -1,4 +1,14 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+"use client";
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Lang } from "@/content/cv";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,7 +29,11 @@ export function useSiteData() {
   const { data } = useQuery({
     queryKey: ["site-content"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("site_content").select("data").eq("id", "default").maybeSingle();
+      const { data, error } = await supabase
+        .from("site_content")
+        .select("data")
+        .eq("id", "default")
+        .maybeSingle();
       if (error) throw error;
       return mergeSiteData(data?.data ?? {});
     },

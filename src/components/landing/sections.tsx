@@ -1,5 +1,6 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { motion, useInView, useReducedMotion, useScroll, useSpring } from "motion/react";
 import { useRef, type ReactNode } from "react";
 import {
@@ -14,7 +15,7 @@ import {
   Phone,
   Star,
 } from "lucide-react";
-import { getGithubRepos } from "@/lib/github.functions";
+import type { Repo } from "@/lib/github";
 import { cn } from "@/lib/utils";
 import { useLang } from "./lang-context";
 import { Eyebrow, Magnetic, Reveal, ScrubText, Section, SectionHeading } from "./primitives";
@@ -125,10 +126,13 @@ export function ProjectsSection() {
 export function ReposSection() {
   const { t, profile } = useLang();
   const username = profile.githubUser;
-  const fetchRepos = useServerFn(getGithubRepos);
+
   const { data } = useQuery({
     queryKey: ["github-repos", username],
-    queryFn: () => fetchRepos({ data: { username } }),
+    queryFn: async (): Promise<Repo[]> => {
+      const res = await fetch(`/api/github-repos?username=${encodeURIComponent(username)}`);
+      return res.ok ? res.json() : [];
+    },
     enabled: username.length > 0,
     staleTime: 60 * 60 * 1000,
   });

@@ -1,11 +1,8 @@
+"use client";
+
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
-
-const INTRO_KEY = "intro-seen";
-const INTRO_EVENT = "intro:done";
-
-/** Inline script: skips the intro loader for repeat visits or reduced motion before paint. */
-export const introBootstrapScript = `(function(){var d=document.documentElement;try{if(sessionStorage.getItem('${INTRO_KEY}')||matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('${INTRO_KEY}');}else{d.classList.add('is-loading');}}catch(e){d.classList.add('${INTRO_KEY}');}})();`;
+import { INTRO_EVENT, INTRO_KEY } from "./intro-script";
 
 /** True once the intro loader has cleared, so entrance animations can start. */
 export function useIntroDone() {
