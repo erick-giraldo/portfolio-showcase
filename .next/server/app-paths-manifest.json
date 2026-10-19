@@ -1,9 +1,0 @@
-{
-  "/_global-error/page": "app/_global-error/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/api/github-repos/route": "app/api/github-repos/route.js",
-  "/api/public/file/[name]/route": "app/api/public/file/[name]/route.js",
-  "/auth/page": "app/auth/page.js",
-  "/page": "app/page.js"
-}

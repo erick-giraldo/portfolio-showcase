@@ -38,3 +38,7 @@ dist-ssr
 
 # Local DB backups
 backups/
+
+# Next.js build output
+.next/
+*.tsbuildinfo
