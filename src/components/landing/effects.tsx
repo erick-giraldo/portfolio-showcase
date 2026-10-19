@@ -1,79 +1,130 @@
-import { motion, useReducedMotion, useScroll, useSpring } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
 
-/** Slim gradient progress bar pinned to the top of the viewport. */
-export function ScrollProgress() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 24, mass: 0.3 });
+const INTRO_KEY = "intro-seen";
+const INTRO_EVENT = "intro:done";
 
-  return (
-    <motion.div
-      aria-hidden
-      style={{ scaleX }}
-      className="fixed inset-x-0 top-0 z-[60] h-[2px] origin-left bg-gradient-to-r from-primary via-aurora to-primary-glow"
-    />
-  );
-}
+/** Inline script: skips the intro loader for repeat visits or reduced motion before paint. */
+export const introBootstrapScript = `(function(){var d=document.documentElement;try{if(sessionStorage.getItem('${INTRO_KEY}')||matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('${INTRO_KEY}');}else{d.classList.add('is-loading');}}catch(e){d.classList.add('${INTRO_KEY}');}})();`;
 
-/** Soft light that follows the pointer, adding depth to the page background. */
-export function CursorSpotlight() {
-  const ref = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
-  const [enabled, setEnabled] = useState(false);
+/** True once the intro loader has cleared, so entrance animations can start. */
+export function useIntroDone() {
+  const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (reduced) return;
-    if (!window.matchMedia("(pointer: fine)").matches) return;
-    setEnabled(true);
+    if (document.documentElement.classList.contains(INTRO_KEY)) {
+      setDone(true);
+      return;
+    }
+    const onDone = () => setDone(true);
+    window.addEventListener(INTRO_EVENT, onDone);
+    return () => window.removeEventListener(INTRO_EVENT, onDone);
+  }, []);
 
-    let frame = 0;
-    const onMove = (e: PointerEvent) => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        const el = ref.current;
-        if (el) el.style.transform = `translate3d(${e.clientX - 320}px, ${e.clientY - 320}px, 0)`;
-      });
+  return done;
+}
+
+const readouts = ["Components", "Variables", "Runtime", "Interfaces", "Deploy"];
+
+/** Full-screen boot sequence: system readouts and a counter racing to 100%. */
+export function IntroLoader() {
+  const [progress, setProgress] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (root.classList.contains(INTRO_KEY)) {
+      setVisible(false);
+      return;
+    }
+
+    const duration = 1900;
+    const start = performance.now();
+    let raf = 0;
+    let timer = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      setProgress(Math.round(eased * 100));
+      if (t < 1) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      timer = window.setTimeout(() => {
+        try {
+          sessionStorage.setItem(INTRO_KEY, "1");
+        } catch {
+          // Private mode: the intro just plays again next visit.
+        }
+        setVisible(false);
+        root.classList.remove("is-loading");
+        root.classList.add(INTRO_KEY);
+        window.dispatchEvent(new Event(INTRO_EVENT));
+      }, 260);
     };
-    window.addEventListener("pointermove", onMove, { passive: true });
+    raf = requestAnimationFrame(tick);
     return () => {
-      window.removeEventListener("pointermove", onMove);
-      if (frame) cancelAnimationFrame(frame);
+      cancelAnimationFrame(raf);
+      window.clearTimeout(timer);
     };
-  }, [reduced]);
+  }, []);
 
-  if (!enabled) return null;
+  const pad = (n: number) => String(n).padStart(3, "0");
 
   return (
-    <div
-      ref={ref}
-      aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-0 h-[640px] w-[640px] rounded-full bg-primary/8 blur-[130px] will-change-transform dark:bg-primary/14"
-    />
+    <AnimatePresence>
+      {visible ? (
+        <motion.div
+          id="intro-loader"
+          key="intro"
+          aria-hidden
+          exit={{ y: "-100%" }}
+          transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
+          className="fixed inset-0 z-[100] flex flex-col justify-between bg-background px-6 py-6 font-display text-foreground sm:px-10 sm:py-8"
+        >
+          <div className="flex items-start justify-between text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
+            <span>EGM // Portfolio</span>
+            <span>Build {new Date().getFullYear()}</span>
+          </div>
+
+          <div className="grid gap-10 sm:grid-cols-[1fr_auto] sm:items-end">
+            <ul className="space-y-1.5 text-sm uppercase tracking-[0.18em]">
+              {readouts.map((r, i) => {
+                const local = Math.max(0, Math.min(100, progress * 1.6 - i * 14));
+                return (
+                  <li key={r} className="flex w-64 justify-between text-muted-foreground">
+                    <span>{r}</span>
+                    <span className={local >= 100 ? "text-foreground" : undefined}>
+                      {pad(Math.round(local))}%
+                    </span>
+                  </li>
+                );
+              })}
+              <li className="pt-3 text-foreground">
+                Status // {progress < 100 ? "Initializing" : "Ready"}
+              </li>
+            </ul>
+            <p className="text-[22vw] font-semibold leading-[0.8] tracking-tight sm:text-[12rem]">
+              {pad(progress)}
+              <span className="text-faint">%</span>
+            </p>
+          </div>
+
+          <span
+            className="absolute inset-x-0 bottom-0 h-1.5 origin-left bg-lime"
+            style={{ transform: `scaleX(${progress / 100})` }}
+          />
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }
 
-/** Page-wide aurora mesh, faint grid and falling light beams. */
-export function AuroraBackdrop() {
-  const beams = [
-    { left: "12%", delay: "0s", duration: "9s" },
-    { left: "34%", delay: "2.4s", duration: "11s" },
-    { left: "58%", delay: "1.2s", duration: "8s" },
-    { left: "81%", delay: "3.6s", duration: "12s" },
-  ];
-
+/** Thin vertical frame lines that run the full page height at the content edges. */
+export function FrameRails() {
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      <div className="grid-backdrop absolute inset-0 opacity-[0.35] [mask-image:radial-gradient(ellipse_at_50%_0%,black,transparent_78%)]" />
-      <div className="aurora-mesh animate-aurora-slow absolute -top-1/3 left-1/2 h-[130vh] w-[140vw] -translate-x-1/2 opacity-40 dark:opacity-55" />
-      {beams.map((b) => (
-        <span
-          key={b.left}
-          className="animate-beam absolute top-0 h-40 w-px bg-gradient-to-b from-transparent via-aurora/50 to-transparent"
-          style={{ left: b.left, animationDelay: b.delay, animationDuration: b.duration }}
-        />
-      ))}
-      <div className="noise-overlay absolute inset-0 opacity-[0.04]" />
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 px-3 sm:px-6">
+      <div className="mx-auto h-full w-full max-w-[84rem] border-x border-frame" />
     </div>
   );
 }

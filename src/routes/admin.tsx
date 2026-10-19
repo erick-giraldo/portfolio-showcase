@@ -1,7 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Loader2, LogOut, Plus, Save, Trash2, Upload } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowUp,
+  Loader2,
+  LogOut,
+  Music2,
+  Plus,
+  Save,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -27,7 +38,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type TabId = "perfil" | "textos" | "proyectos" | "listas" | "archivos";
+type TabId = "perfil" | "textos" | "proyectos" | "listas" | "archivos" | "musica";
 
 const tabs: { id: TabId; label: string }[] = [
   { id: "perfil", label: "Perfil y enlaces" },
@@ -35,6 +46,7 @@ const tabs: { id: TabId; label: string }[] = [
   { id: "proyectos", label: "Proyectos" },
   { id: "listas", label: "Listas" },
   { id: "archivos", label: "Archivos" },
+  { id: "musica", label: "Música" },
 ];
 
 const inputClass =
@@ -59,7 +71,12 @@ function Field({
         {label}
       </span>
       {textarea ? (
-        <textarea rows={rows} className={inputClass} value={value} onChange={(e) => onChange(e.target.value)} />
+        <textarea
+          rows={rows}
+          className={inputClass}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
       ) : (
         <input className={inputClass} value={value} onChange={(e) => onChange(e.target.value)} />
       )}
@@ -137,7 +154,11 @@ function AdminPage() {
   const { data: remote } = useQuery({
     queryKey: ["site-content-admin"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("site_content").select("data").eq("id", "default").maybeSingle();
+      const { data, error } = await supabase
+        .from("site_content")
+        .select("data")
+        .eq("id", "default")
+        .maybeSingle();
       if (error) throw error;
       return mergeSiteData(data?.data ?? {});
     },
@@ -194,7 +215,9 @@ function AdminPage() {
     try {
       const ext = file.name.split(".").pop() ?? "bin";
       const name = `${kind}-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("site-files").upload(name, file, { upsert: true });
+      const { error } = await supabase.storage
+        .from("site-files")
+        .upload(name, file, { upsert: true });
       if (error) throw error;
       const url = `/api/public/file/${name}`;
       setProfile(kind === "cv" ? "cvUrl" : "portraitUrl", url);
@@ -206,7 +229,62 @@ function AdminPage() {
     }
   };
 
-  const headingKeys = useMemo(() => Object.keys(dict.sections) as (keyof typeof dict.sections)[], [dict.sections]);
+  type Track = SiteData["music"]["tracks"][number];
+  const music = current.music;
+
+  const setMusic = (patch: Partial<SiteData["music"]>) =>
+    setDraft({ ...current, music: { ...music, ...patch } });
+
+  const setTrack = (index: number, patch: Partial<Track>) =>
+    setMusic({ tracks: music.tracks.map((t, i) => (i === index ? { ...t, ...patch } : t)) });
+
+  const removeTrack = (index: number) => {
+    // `active` counts the built-in ambient entry as 0, so track i is entry i + 1.
+    const entry = index + 1;
+    const active =
+      music.active === entry ? 0 : music.active > entry ? music.active - 1 : music.active;
+    setMusic({ tracks: music.tracks.filter((_, i) => i !== index), active });
+  };
+
+  const moveTrack = (index: number, dir: -1 | 1) => {
+    const to = index + dir;
+    if (to < 0 || to >= music.tracks.length) return;
+    const tracks = [...music.tracks];
+    [tracks[index], tracks[to]] = [tracks[to]!, tracks[index]!];
+    const active =
+      music.active === index + 1 ? to + 1 : music.active === to + 1 ? index + 1 : music.active;
+    setMusic({ tracks, active });
+  };
+
+  const uploadTracks = async (files: File[]) => {
+    setUploading("music");
+    try {
+      const added: Track[] = [];
+      for (const file of files) {
+        const ext = file.name.split(".").pop() ?? "mp3";
+        const name = `track-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+        const { error } = await supabase.storage
+          .from("site-files")
+          .upload(name, file, { upsert: true, ...(file.type ? { contentType: file.type } : {}) });
+        if (error) throw error;
+        added.push({
+          title: file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " "),
+          src: `/api/public/file/${name}`,
+        });
+      }
+      setMusic({ tracks: [...music.tracks, ...added] });
+      toast.success(`${added.length} pista(s) subida(s). Recuerda guardar los cambios.`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo subir el audio");
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  const headingKeys = useMemo(
+    () => Object.keys(dict.sections) as (keyof typeof dict.sections)[],
+    [dict.sections],
+  );
 
   if (loading || roleLoading || !draft) {
     return (
@@ -249,7 +327,9 @@ function AdminPage() {
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Ver el sitio
               </a>
-              <h1 className="mt-2 font-display text-2xl font-semibold text-foreground">Panel de contenido</h1>
+              <h1 className="mt-2 font-display text-2xl font-semibold text-foreground">
+                Panel de contenido
+              </h1>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
             </div>
             <div className="flex items-center gap-2">
@@ -265,7 +345,11 @@ function AdminPage() {
                 disabled={saving}
                 className="shine inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-glow px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60"
               >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
                 Guardar
               </button>
             </div>
@@ -287,7 +371,7 @@ function AdminPage() {
             ))}
           </div>
 
-          {tab !== "perfil" && tab !== "archivos" ? (
+          {tab !== "perfil" && tab !== "archivos" && tab !== "musica" ? (
             <div className="mt-4 inline-flex rounded-xl border border-border p-1">
               {(["es", "en"] as Lang[]).map((l) => (
                 <button
@@ -306,13 +390,41 @@ function AdminPage() {
           <div className="glass-card mt-6 space-y-5 rounded-3xl p-6">
             {tab === "perfil" ? (
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Nombre" value={current.profile.name} onChange={(v) => setProfile("name", v)} />
-                <Field label="Iniciales" value={current.profile.initials} onChange={(v) => setProfile("initials", v)} />
-                <Field label="Ubicación" value={current.profile.location} onChange={(v) => setProfile("location", v)} />
-                <Field label="Teléfono" value={current.profile.phone} onChange={(v) => setProfile("phone", v)} />
-                <Field label="Email" value={current.profile.email} onChange={(v) => setProfile("email", v)} />
-                <Field label="LinkedIn (URL)" value={current.profile.linkedin} onChange={(v) => setProfile("linkedin", v)} />
-                <Field label="GitHub (URL)" value={current.profile.github} onChange={(v) => setProfile("github", v)} />
+                <Field
+                  label="Nombre"
+                  value={current.profile.name}
+                  onChange={(v) => setProfile("name", v)}
+                />
+                <Field
+                  label="Iniciales"
+                  value={current.profile.initials}
+                  onChange={(v) => setProfile("initials", v)}
+                />
+                <Field
+                  label="Ubicación"
+                  value={current.profile.location}
+                  onChange={(v) => setProfile("location", v)}
+                />
+                <Field
+                  label="Teléfono"
+                  value={current.profile.phone}
+                  onChange={(v) => setProfile("phone", v)}
+                />
+                <Field
+                  label="Email"
+                  value={current.profile.email}
+                  onChange={(v) => setProfile("email", v)}
+                />
+                <Field
+                  label="LinkedIn (URL)"
+                  value={current.profile.linkedin}
+                  onChange={(v) => setProfile("linkedin", v)}
+                />
+                <Field
+                  label="GitHub (URL)"
+                  value={current.profile.github}
+                  onChange={(v) => setProfile("github", v)}
+                />
                 <Field
                   label="Usuario de GitHub (para repos)"
                   value={current.profile.githubUser}
@@ -323,8 +435,16 @@ function AdminPage() {
 
             {tab === "textos" ? (
               <div className="space-y-4">
-                <Field label="Badge del hero" value={dict.hero.badge} onChange={(v) => setDict({ hero: { ...dict.hero, badge: v } })} />
-                <Field label="Rol / título" value={dict.hero.role} onChange={(v) => setDict({ hero: { ...dict.hero, role: v } })} />
+                <Field
+                  label="Badge del hero"
+                  value={dict.hero.badge}
+                  onChange={(v) => setDict({ hero: { ...dict.hero, badge: v } })}
+                />
+                <Field
+                  label="Rol / título"
+                  value={dict.hero.role}
+                  onChange={(v) => setDict({ hero: { ...dict.hero, role: v } })}
+                />
                 <Field
                   label="Tagline"
                   textarea
@@ -332,26 +452,46 @@ function AdminPage() {
                   value={dict.hero.tagline}
                   onChange={(v) => setDict({ hero: { ...dict.hero, tagline: v } })}
                 />
-                <Field label="Idiomas (pie de contacto)" value={dict.languages} onChange={(v) => setDict({ languages: v })} />
-                <Field label="Nota del footer" value={dict.footerNote} onChange={(v) => setDict({ footerNote: v })} />
+                <Field
+                  label="Idiomas (pie de contacto)"
+                  value={dict.languages}
+                  onChange={(v) => setDict({ languages: v })}
+                />
+                <Field
+                  label="Nota del footer"
+                  value={dict.footerNote}
+                  onChange={(v) => setDict({ footerNote: v })}
+                />
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   {headingKeys.map((key) => (
                     <div key={key} className="rounded-2xl border border-border/70 p-4">
-                      <p className="mb-3 font-display text-xs uppercase tracking-[0.18em] text-aurora">{key}</p>
+                      <p className="mb-3 font-display text-xs uppercase tracking-[0.18em] text-aurora">
+                        {key}
+                      </p>
                       <div className="space-y-3">
                         <Field
                           label="Eyebrow"
                           value={dict.sections[key].eyebrow}
                           onChange={(v) =>
-                            setDict({ sections: { ...dict.sections, [key]: { ...dict.sections[key], eyebrow: v } } })
+                            setDict({
+                              sections: {
+                                ...dict.sections,
+                                [key]: { ...dict.sections[key], eyebrow: v },
+                              },
+                            })
                           }
                         />
                         <Field
                           label="Título"
                           value={dict.sections[key].title}
                           onChange={(v) =>
-                            setDict({ sections: { ...dict.sections, [key]: { ...dict.sections[key], title: v } } })
+                            setDict({
+                              sections: {
+                                ...dict.sections,
+                                [key]: { ...dict.sections[key], title: v },
+                              },
+                            })
                           }
                         />
                         <Field
@@ -360,7 +500,12 @@ function AdminPage() {
                           rows={2}
                           value={dict.sections[key].subtitle}
                           onChange={(v) =>
-                            setDict({ sections: { ...dict.sections, [key]: { ...dict.sections[key], subtitle: v } } })
+                            setDict({
+                              sections: {
+                                ...dict.sections,
+                                [key]: { ...dict.sections[key], subtitle: v },
+                              },
+                            })
                           }
                         />
                       </div>
@@ -374,7 +519,8 @@ function AdminPage() {
               <div className="space-y-5">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xs text-muted-foreground">
-                    Edita tus proyectos destacados ({lang.toUpperCase()}). Añade el enlace al repositorio de GitHub de cada uno.
+                    Edita tus proyectos destacados ({lang.toUpperCase()}). Añade el enlace al
+                    repositorio de GitHub de cada uno.
                   </p>
                   <button
                     onClick={addProject}
@@ -401,8 +547,16 @@ function AdminPage() {
                       </button>
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">
-                      <Field label="Título" value={p.name} onChange={(v) => setProject(i, { name: v })} />
-                      <Field label="Año" value={p.year} onChange={(v) => setProject(i, { year: v })} />
+                      <Field
+                        label="Título"
+                        value={p.name}
+                        onChange={(v) => setProject(i, { name: v })}
+                      />
+                      <Field
+                        label="Año"
+                        value={p.year}
+                        onChange={(v) => setProject(i, { year: v })}
+                      />
                     </div>
                     <Field
                       label="Descripción"
@@ -414,25 +568,38 @@ function AdminPage() {
                     <Field
                       label="Tecnologías (separadas por comas)"
                       value={p.tags.join(", ")}
-                      onChange={(v) => setProject(i, { tags: v.split(",").map((t) => t.trim()).filter(Boolean) })}
+                      onChange={(v) =>
+                        setProject(i, {
+                          tags: v
+                            .split(",")
+                            .map((t) => t.trim())
+                            .filter(Boolean),
+                        })
+                      }
                     />
                     <div className="grid gap-4 sm:grid-cols-2">
                       <Field
                         label="Enlace del proyecto (opcional)"
                         value={p.href ?? ""}
-                        onChange={(v) => setProject(i, { href: v || undefined } as Partial<Project>)}
+                        onChange={(v) =>
+                          setProject(i, { href: v || undefined } as Partial<Project>)
+                        }
                       />
                       <Field
                         label="Repositorio GitHub (opcional)"
                         value={p.repo ?? ""}
-                        onChange={(v) => setProject(i, { repo: v || undefined } as Partial<Project>)}
+                        onChange={(v) =>
+                          setProject(i, { repo: v || undefined } as Partial<Project>)
+                        }
                       />
                     </div>
                   </div>
                 ))}
 
                 {dict.projects.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Aún no hay proyectos. Pulsa «Añadir proyecto».</p>
+                  <p className="text-sm text-muted-foreground">
+                    Aún no hay proyectos. Pulsa «Añadir proyecto».
+                  </p>
                 ) : null}
               </div>
             ) : null}
@@ -475,13 +642,154 @@ function AdminPage() {
               </div>
             ) : null}
 
+            {tab === "musica" ? (
+              <div className="space-y-5">
+                <div>
+                  <p className="font-display text-sm font-semibold text-foreground">
+                    Soundtrack del sitio
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Marca la pista que el reproductor carga por defecto. Las demás quedan en la
+                    lista para que el visitante las elija. Los navegadores no permiten reproducir
+                    música sin un clic del visitante.
+                  </p>
+                </div>
+
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-3 rounded-2xl border border-border p-3">
+                    <input
+                      type="radio"
+                      name="active-track"
+                      checked={music.active === 0}
+                      onChange={() => setMusic({ active: 0 })}
+                      className="h-4 w-4 accent-[var(--primary)]"
+                    />
+                    <Music2 className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">Ambiente generativo</p>
+                      <p className="text-xs text-muted-foreground">
+                        Incluido · se sintetiza en el navegador
+                      </p>
+                    </div>
+                  </li>
+
+                  {music.tracks.map((track, i) => (
+                    <li
+                      key={`${track.src}-${i}`}
+                      className="space-y-3 rounded-2xl border border-border p-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="active-track"
+                          checked={music.active === i + 1}
+                          onChange={() => setMusic({ active: i + 1 })}
+                          className="h-4 w-4 accent-[var(--primary)]"
+                          aria-label={`Usar ${track.title} por defecto`}
+                        />
+                        <span className="w-6 font-mono text-xs text-muted-foreground">
+                          {String(i + 2).padStart(2, "0")}
+                        </span>
+                        <input
+                          className={inputClass}
+                          value={track.title}
+                          placeholder="Título"
+                          onChange={(e) => setTrack(i, { title: e.target.value })}
+                        />
+                        <button
+                          onClick={() => moveTrack(i, -1)}
+                          disabled={i === 0}
+                          aria-label="Subir"
+                          className="rounded-lg p-2 text-muted-foreground hover:text-foreground disabled:opacity-30"
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => moveTrack(i, 1)}
+                          disabled={i === music.tracks.length - 1}
+                          aria-label="Bajar"
+                          className="rounded-lg p-2 text-muted-foreground hover:text-foreground disabled:opacity-30"
+                        >
+                          <ArrowDown className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => removeTrack(i)}
+                          aria-label="Eliminar"
+                          className="rounded-lg p-2 text-muted-foreground hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <div className="grid gap-3 pl-[3.25rem] sm:grid-cols-[1fr_auto] sm:items-center">
+                        <input
+                          className={inputClass}
+                          value={track.src}
+                          placeholder="URL del audio (.mp3, .m4a, .ogg)"
+                          onChange={(e) => setTrack(i, { src: e.target.value })}
+                        />
+                        {track.src ? (
+                          <audio
+                            controls
+                            preload="none"
+                            src={track.src}
+                            className="h-9 w-full sm:w-64"
+                          />
+                        ) : null}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex flex-wrap gap-2">
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm text-foreground hover:border-primary">
+                    {uploading === "music" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Upload className="h-4 w-4" />
+                    )}
+                    Subir audio
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = [...(e.target.files ?? [])];
+                        e.target.value = "";
+                        if (files.length) void uploadTracks(files);
+                      }}
+                    />
+                  </label>
+                  <button
+                    onClick={() =>
+                      setMusic({ tracks: [...music.tracks, { title: "Nueva pista", src: "" }] })
+                    }
+                    className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm text-foreground hover:border-primary"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Agregar por URL
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Usa solo música con licencia para tu sitio. Las URLs externas necesitan permitir
+                  su uso desde otros dominios; si no, súbelas aquí.
+                </p>
+              </div>
+            ) : null}
+
             {tab === "archivos" ? (
               <div className="space-y-6">
                 <div>
                   <p className="font-display text-sm font-semibold text-foreground">CV en PDF</p>
-                  <p className="mt-1 text-xs text-muted-foreground">Actual: {current.profile.cvUrl}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Actual: {current.profile.cvUrl}
+                  </p>
                   <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm text-foreground hover:border-primary">
-                    {uploading === "cv" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                    {uploading === "cv" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Upload className="h-4 w-4" />
+                    )}
                     Subir PDF
                     <input
                       type="file"
@@ -493,11 +801,17 @@ function AdminPage() {
                       }}
                     />
                   </label>
-                  <Field label="O pega una URL" value={current.profile.cvUrl} onChange={(v) => setProfile("cvUrl", v)} />
+                  <Field
+                    label="O pega una URL"
+                    value={current.profile.cvUrl}
+                    onChange={(v) => setProfile("cvUrl", v)}
+                  />
                 </div>
 
                 <div>
-                  <p className="font-display text-sm font-semibold text-foreground">Foto de perfil</p>
+                  <p className="font-display text-sm font-semibold text-foreground">
+                    Foto de perfil
+                  </p>
                   <img
                     src={current.profile.portraitUrl}
                     alt="Retrato actual"

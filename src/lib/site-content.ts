@@ -17,8 +17,17 @@ export type SiteProfile = {
   portraitUrl: string;
 };
 
+export type MusicTrack = { title: string; src: string };
+
+/** Soundtrack for the landing player. `active` is the default entry: 0 = generative ambient, n = tracks[n - 1]. */
+export type SiteMusic = {
+  tracks: MusicTrack[];
+  active: number;
+};
+
 export type SiteData = {
   profile: SiteProfile;
+  music: SiteMusic;
   es: Dict;
   en: Dict;
 };
@@ -31,6 +40,7 @@ export const defaultSiteData: SiteData = {
     cvUrl: cvAsset.url,
     portraitUrl: portraitAsset.url,
   },
+  music: { tracks: [], active: 0 },
   es: content.es,
   en: content.en,
 };
